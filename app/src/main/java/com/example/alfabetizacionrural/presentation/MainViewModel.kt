@@ -9,6 +9,12 @@ import com.example.alfabetizacionrural.data.local.UserEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+/*
+Proposito
+ */
+/*
+application representa la app, se usa en ViewModel para realizar operaciones que necesitan permiso
+*/
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
