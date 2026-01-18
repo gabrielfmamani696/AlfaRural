@@ -1,0 +1,101 @@
+// Define el "paquete" o la carpeta lógica donde se encuentra este archivo. 
+// Ayuda a organizar tu proyecto.
+package com.example.alfabetizacionrural
+
+// --- SECCIÓN DE IMPORTACIONES ---
+// Aquí se "importan" las herramientas y componentes que se usarán en este archivo.
+
+import android.os.Bundle // Necesario para manejar el estado de la Activity, como en el método onCreate.
+import androidx.activity.ComponentActivity // La clase base para una Activity que usa Jetpack Compose.
+import androidx.activity.compose.setContent // Una función para establecer el contenido de la UI con Compose.
+import androidx.activity.viewModels // Una forma fácil de crear y obtener un ViewModel.
+import androidx.compose.foundation.layout.Box // Un contenedor de Compose que apila sus hijos uno encima de otro.
+import androidx.compose.foundation.layout.fillMaxSize // Un modificador que hace que un elemento ocupe todo el espacio disponible.
+import androidx.compose.material3.CircularProgressIndicator // El círculo de carga que gira.
+import androidx.compose.material3.MaterialTheme // Define el estilo visual de la app (colores, fuentes, etc.).
+import androidx.compose.material3.Surface // Un contenedor con un color de fondo del tema.
+import androidx.compose.runtime.collectAsState // Convierte un Flow (flujo de datos) en un Estado que Compose puede observar.
+import androidx.compose.runtime.getValue // Una forma de acceder al valor de un Estado de Compose.
+import androidx.compose.ui.Alignment // Se usa para alinear elementos (por ejemplo, al centro).
+import androidx.compose.ui.Modifier // Permite decorar o añadir comportamiento a los elementos de Compose (tamaño, clics, etc.).
+import androidx.navigation.compose.rememberNavController // Crea y recuerda un controlador para la navegación entre pantallas.
+import com.example.alfabetizacionrural.presentation.MainViewModel // Importa tu ViewModel personalizado.
+import com.example.alfabetizacionrural.presentation.navigation.AppDestinations // Importa tus destinos de navegación.
+import com.example.alfabetizacionrural.presentation.navigation.AppNavigationGraph // Importa el gráfico de navegación que define las rutas.
+
+// --- DEFINICIÓN DE LA CLASE ---
+
+// Declara la clase MainActivity. Es la pantalla principal y el punto de entrada de tu app.
+// Hereda de ComponentActivity, que es la base para usar Compose.
+class MainActivity : ComponentActivity() {
+    
+    // Crea una instancia del MainViewModel.
+    // "private val": Crea una variable privada y de solo lectura.
+    // "by viewModels()": Es un atajo que crea, retiene y proporciona el ViewModel.
+    // Lo más importante: este ViewModel sobrevive a cambios como la rotación de la pantalla,
+    // por lo que los datos no se pierden.
+    private val mainViewModel: MainViewModel by viewModels()
+
+    // --- MÉTODO ONCREATE ---
+    // Este método se llama cuando la Activity (la pantalla) se crea por primera vez.
+    // Es donde configuras todo lo inicial.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Llama al mismo método de la clase padre para que haga su configuración inicial. Siempre es necesario.
+        super.onCreate(savedInstanceState)
+
+        // Aquí le dices a la Activity que su contenido será dibujado usando Jetpack Compose.
+        setContent {
+            // Aplica el tema visual definido en tu app (colores, tipografías, etc.).
+            MaterialTheme {
+                // Surface es como un lienzo principal para tu UI.
+                // Le damos un tamaño que ocupe toda la pantalla y un color de fondo del tema.
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    // Crea y recuerda un controlador de navegación. Este objeto se encargará
+                    // de cambiar entre las diferentes pantallas de tu app.
+                    val navController = rememberNavController()
+
+                    // --- OBSERVACIÓN DEL ESTADO ---
+                    
+                    // Observa la variable 'isLoading' del ViewModel.
+                    // 'collectAsState()' hace que la UI se redibuje automáticamente cuando 'isLoading' cambia (de true a false o viceversa).
+                    val isLoading by mainViewModel.isLoading.collectAsState()
+
+                    // Hace lo mismo para 'currentUser'. La UI reaccionará si el usuario inicia o cierra sesión.
+                    val currentUser by mainViewModel.currentUser.collectAsState()
+
+                    // --- LÓGICA DE LA UI ---
+
+                    // Si 'isLoading' es verdadero...
+                    if (isLoading) {
+                        // ...muestra un indicador de carga en el centro de la pantalla.
+                        // Box se usa para centrar fácilmente el CircularProgressIndicator.
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        // Si no está cargando, decide a qué pantalla dirigir al usuario.
+                        
+                        // Si 'currentUser' no es nulo (es decir, hay un usuario logueado)...
+                        val startDestination = if (currentUser != null) {
+                            // ...la pantalla inicial será el panel principal.
+                            AppDestinations.MAIN_DASHBOARD
+                        } else {
+                            // ...si es nulo, la pantalla inicial será la de registro.
+                            AppDestinations.REGISTRATION
+                        }
+
+                        // Llama al componente que contiene toda la lógica de navegación de la app.
+                        AppNavigationGraph(
+                            navController = navController, // Le pasa el controlador para que sepa cómo navegar.
+                            startDestination = startDestination, // Le dice cuál es la primera pantalla a mostrar.
+                            onFinish = { finish() } // Le pasa una acción para ejecutar (en este caso, cerrar la app).
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

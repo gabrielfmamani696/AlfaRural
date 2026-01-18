@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 /*
 Proposito
+El objetivo principal de la clase MainViewModel es actuar como un intermediario y gestor de datos para la MainActivity (la pantalla principal).
+el objetivo de MainViewModel es obtener, preparar y mantener los datos que la pantalla necesita, de una manera robusta y eficiente, independientemente del ciclo de vida de la interfaz de usuario.
  */
 /*
 application representa la app, se usa en ViewModel para realizar operaciones que necesitan permiso

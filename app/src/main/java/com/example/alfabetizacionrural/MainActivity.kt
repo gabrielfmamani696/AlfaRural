@@ -19,9 +19,6 @@ import com.example.alfabetizacionrural.presentation.navigation.AppDestinations
 import com.example.alfabetizacionrural.presentation.navigation.AppNavigationGraph
 
 class MainActivity : ComponentActivity() {
-    /*
-    * esta linea
-     */
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
